@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
 using TaskManager.Shared.Entities;
 
 namespace TaskManager.Backend.Controllers
@@ -29,8 +27,8 @@ namespace TaskManager.Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(MyTask myTask) 
-        { 
+        public IActionResult Post(MyTask myTask)
+        {
             _myTasks.Add(myTask);
             return Ok(myTask);
         }
@@ -52,7 +50,7 @@ namespace TaskManager.Backend.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult Delete(int id) 
+        public IActionResult Delete(int id)
         {
             var task = _myTasks.FirstOrDefault(t => t.Id == id);
             if (task == null)
