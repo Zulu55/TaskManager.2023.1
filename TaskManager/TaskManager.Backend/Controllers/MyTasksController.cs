@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using TaskManager.Backend.Data;
 using TaskManager.Shared.Entities;
 
