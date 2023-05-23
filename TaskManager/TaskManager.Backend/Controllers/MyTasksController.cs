@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using TaskManager.Backend.Data;
 using TaskManager.Shared.Entities;
 
@@ -26,7 +25,7 @@ namespace TaskManager.Backend.Controllers
         public IActionResult Get(int id)
         {
             var task = _context.MyTasks.FirstOrDefault(x => x.Id == id);
-            if (task == null) 
+            if (task == null)
             {
                 return NotFound();
             }
