@@ -24,7 +24,7 @@ namespace TaskManager.Backend.Controllers
         [HttpGet("{id:int}")]
         public IActionResult Get(int id)
         {
-            var task = _context.MyTasks.FirstOrDefault(t => t.Id == id);
+            var task = _context.MyTasks.FirstOrDefault(x => x.Id == id);
             if (task == null)
             {
                 return NotFound();
@@ -43,7 +43,7 @@ namespace TaskManager.Backend.Controllers
         [HttpPut]
         public IActionResult Put(MyTask myTask)
         {
-            var task = _context.MyTasks.FirstOrDefault(t => t.Id == myTask.Id);
+            var task = _context.MyTasks.FirstOrDefault(x => x.Id == myTask.Id);
             if (task == null)
             {
                 return NotFound();
@@ -55,19 +55,18 @@ namespace TaskManager.Backend.Controllers
 
             _context.Update(task);
             _context.SaveChanges();
-            return Ok(myTask);
+            return Ok(task);
         }
 
         [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            var task = _context.MyTasks.FirstOrDefault(t => t.Id == id);
+            var task = _context.MyTasks.FirstOrDefault(x => x.Id == id);
             if (task == null)
             {
                 return NotFound();
             }
-
-            _context.MyTasks.Remove(task);
+            _context.Remove(task);
             _context.SaveChanges();
             return NoContent();
         }
