@@ -1,0 +1,13 @@
+﻿@page "/tasks"
+@inject IRepository repository
+
+<h3>Tasks</h3>
+
+@code {
+    public List<MyTask>? Tasks { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+}
