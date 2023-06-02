@@ -2,6 +2,18 @@
 
 <h3>New Task</h3>
 
-@code {
+<TaskForm MyTask="myTask" OnValidSubmit="Create" ReturnAction="Return" />
 
+@code {
+    private MyTask myTask = new();
+
+    private void Create()
+    {
+        
+    }
+
+    private void Return()
+    {
+
+    }
 }
