@@ -1,5 +1,7 @@
 ﻿@page "/tasks"
 @inject IRepository repository
+@inject SweetAlertService sweetAlertService
+@inject NavigationManager navigationManager
 
 <h3>Tasks</h3>
 @if (Tasks == null)
@@ -27,8 +29,8 @@ else
                     <td>@task.IsCompleted</td>
                     <td>
                         <a href="/tasks/edit/@task.Id" class="btn btn-warning">Edit</a>
-                        <button class="btn btn-info">Complete</button>
-                        <button class="btn btn-danger">Delete</button>
+                        <button class=@(task.IsCompleted ? "btn btn-secondary" : "btn btn-info") @onclick=@(() => CompleteUncompleteAsync(task))>@(task.IsCompleted ? "Uncomplete" : "Complete")</button>
+                        <button class="btn btn-danger" @onclick=@(() => DeleteAsync(task))>Delete</button>
                     </td>
                 </tr>
             }
@@ -36,16 +38,95 @@ else
     </table>
 }
 
-
 @code {
     public List<MyTask>? Tasks { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await repository.GetAsync<List<MyTask>>("api/MyTasks");
-        if (response.IsSuccess)
+        await LoadTasksAsync();
+    }
+
+    private async Task LoadTasksAsync()
+    {
+        var responseHttp = await repository.GetAsync<List<MyTask>>("api/MyTasks");
+        if (!responseHttp.IsSuccess)
         {
-            Tasks = response.Result;
+            await sweetAlertService.FireAsync("Error", responseHttp.Message, SweetAlertIcon.Error);
+            return;
         }
+        Tasks = responseHttp.Result;
+    }
+
+    private async Task DeleteAsync(MyTask task)
+    {
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+        {
+            Title = "Confirm",
+            Text = $"Are you sure to delete the task: {task.Description}?",
+            Icon = SweetAlertIcon.Question,
+            ShowCancelButton = true
+        });
+
+        var confirm = string.IsNullOrEmpty(result.Value);
+        if (confirm)
+        {
+            return;
+        }
+
+        var responseHttp = await repository.DeleteAsync<MyTask>($"api/MyTasks/{task.Id}");
+        if (!responseHttp.IsSuccess)
+        {
+            await sweetAlertService.FireAsync("Error", responseHttp.Message, SweetAlertIcon.Error);
+            return;
+        }
+
+        LoadTasksAsync();
+
+        var toast = sweetAlertService.Mixin(new SweetAlertOptions
+            {
+                Toast = true,
+                Position = SweetAlertPosition.BottomEnd,
+                ShowCloseButton = true,
+                Timer = 3000
+            });
+        await toast.FireAsync(icon: SweetAlertIcon.Info, message: "Tasks deleted successfully.");
+    }
+
+    private async Task CompleteUncompleteAsync(MyTask task)
+    {
+        var message = task.IsCompleted ? "uncomplete" : "complete";
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirm",
+                Text = $"Are you sure to {message} the task: {task.Description}?",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true
+            });
+
+        var confirm = string.IsNullOrEmpty(result.Value);
+        if (confirm)
+        {
+            return;
+        }
+
+        task.IsCompleted = !task.IsCompleted;
+
+        var responseHttp = await repository.PutAsync($"api/MyTasks", task);
+        if (!responseHttp.IsSuccess)
+        {
+            await sweetAlertService.FireAsync("Error", responseHttp.Message, SweetAlertIcon.Error);
+            return;
+        }
+
+        LoadTasksAsync();
+
+        var toast = sweetAlertService.Mixin(new SweetAlertOptions
+            {
+                Toast = true,
+                Position = SweetAlertPosition.BottomEnd,
+                ShowCloseButton = true,
+                Timer = 3000
+            });
+        await toast.FireAsync(icon: SweetAlertIcon.Info, message: $"Task {message} successfully.");
     }
 }
