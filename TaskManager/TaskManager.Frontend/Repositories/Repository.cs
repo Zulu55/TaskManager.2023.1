@@ -3,11 +3,16 @@ using TaskManager.Shared.Models;
 
 namespace TaskManager.Frontend.Repositories
 {
-    public class Respository : IRespository
+    public class Repository : IRepository
     {
         private readonly HttpClient _httpClient;
 
-        public Respository(HttpClient httpClient)
+        private JsonSerializerOptions _jsonDefaultOptions => new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+        };
+
+        public Repository(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -25,7 +30,7 @@ namespace TaskManager.Frontend.Repositories
             }
 
             var responseString = await responseHttp.Content.ReadAsStringAsync();
-            var responseJson = JsonSerializer.Deserialize<T>(responseString);
+            var responseJson = JsonSerializer.Deserialize<T>(responseString, _jsonDefaultOptions);
             return new Response<T>
             {
                 IsSuccess = true,
